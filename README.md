@@ -1,2 +1,2 @@
 # hw_06
- Home works 06
+ home work 6
