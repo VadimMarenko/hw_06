@@ -49,8 +49,9 @@ def report(path: Path):
             print("|{}".format("-" * 60))
             print("|{:<60}".format(get_extensions(item)))
             print("|{}".format("-" * 60))
-            for it in item.iterdir():                
-                print("|{:<60}".format(it.name))
+            for it in item.iterdir():
+                if it.is_file():
+                    print("|{:<60}".format(it.name))
             print("|{}".format("-" * 60))
             
 
@@ -64,42 +65,47 @@ def unpack_archives(path: Path):
         except ValueError as er:
             print(f"File {arch} {er}")
         
-           
-def del_empty_folders(path: Path) -> None:    
-    for item in path.glob("**/*"):        
-        if item.is_dir() and item.name not in CATEGORIES.keys():            
-            try:
-                shutil.rmtree(item)
-            except UnicodeEncodeError as er:
-                print(f"{er}")
-            except OSError as er:
-                print(f"{er}")
-        
+def del_empty_folders(path: Path) -> None:
+    for item in path.iterdir():        
+        if item.is_dir():
+            del_empty_folders(item)
+            if not any(item.iterdir()):
+                try:
+                    item.rmdir()
+                except UnicodeEncodeError as er:
+                    print(f"{er}")
+                except OSError as er:
+                    print(f"{er}")
 
-def move_file(file: Path, root_dir: Path, categorie: str):    
-    target_dir = root_dir.joinpath(categorie)        
+
+def move_file(file: Path, path: Path, categorie: str) -> None:    
+    target_dir = path.joinpath(categorie)
     if not target_dir.exists():
         target_dir.mkdir()
     new_name = target_dir.joinpath(f"{normalize(file.stem)}{file.suffix}")
     if new_name.exists():        
-        new_name = new_name.with_name(f"{new_name.stem}_renamed{file.suffix}")        
-    if file.parent != target_dir:        
+        new_name = new_name.with_name(f"{new_name.stem}_renamed{file.suffix}")
+    if file.parent != target_dir:
         file.rename(new_name)
 
-def get_categories(file: Path) -> str:
+def get_categorie(file: Path) -> str:
     ext = file.suffix.lower()
     for categorie, extensions in CATEGORIES.items():
         if ext in extensions:
             return categorie
     return "Other"
 
-def sort_folder(path: Path) -> None:
-    for item in path.glob("**/*"):        
-        if item.is_file():
-            cat = get_categories(item)
-            move_file(item, path, cat)
-
-
+def sort_folder(path: Path, item_path: Path) -> None:
+    #for item in path.glob("**/*"):        
+    for item in item_path.iterdir():        
+        if item.is_dir():
+            if item.name in CATEGORIES.keys():                
+                continue
+            sort_folder(path, item)
+        elif item.is_file():                          
+            categorie = get_categorie(item)
+            move_file(item, path, categorie)
+    
 def main():
     try:
         #path = Path(sys.argv[1])
@@ -110,7 +116,7 @@ def main():
     if not path.exists():
         return f"Folder with path {path} doesn't exist."
     
-    sort_folder(path)        
+    sort_folder(path, path)        
     del_empty_folders(path)
     unpack_archives(path)
     report(path)
