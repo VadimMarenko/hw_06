@@ -102,7 +102,8 @@ def sort_folder(path: Path) -> None:
 
 def main():
     try:
-        path = Path(sys.argv[1])
+        #path = Path(sys.argv[1])
+        path = Path(r"/home/varadad/test_DIR_hw_06")
     except IndexError as er:
         return f"Specify the folder to sort"
     
