@@ -103,8 +103,8 @@ def sort_folder(path: Path) -> None:
 def main():
     try:
         path = Path(sys.argv[1])
-    except IndexError:
-        return f"No path to folder {sys.argv[1]}"
+    except IndexError as er:
+        return f"Specify the folder to sort"
     
     if not path.exists():
         return f"Folder with path {path} doesn't exist."
