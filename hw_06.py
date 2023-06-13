@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 import shutil 
-
+from uuid import uuid4
 
 CATEGORIES = {"Audio": [".mp3", ".ogg", ".wav", ".amr", ".aiff"],
               "Documents": [".doc", ".docx", ".xlsx", ".pptx", ".pdf", ".txt"],
@@ -84,7 +84,7 @@ def move_file(file: Path, path: Path, categorie: str) -> None:
         target_dir.mkdir()
     new_name = target_dir.joinpath(f"{normalize(file.stem)}{file.suffix}")
     if new_name.exists():        
-        new_name = new_name.with_name(f"{new_name.stem}_renamed{file.suffix}")
+        new_name = new_name.with_name(f"{new_name.stem}_{uuid4()}{file.suffix}")
     if file.parent != target_dir:
         file.rename(new_name)
 
@@ -107,8 +107,7 @@ def sort_folder(path: Path, item_path: Path) -> None:
     
 def main():
     try:
-        path = Path(sys.argv[1])
-        #path = Path(r"/home/varadad/test_DIR_hw_06")
+        path = Path(sys.argv[1])        
     except IndexError as er:
         return f"Specify the folder to sort"
     
