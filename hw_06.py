@@ -95,8 +95,7 @@ def get_categorie(file: Path) -> str:
             return categorie
     return "Other"
 
-def sort_folder(path: Path, item_path: Path) -> None:
-    #for item in path.glob("**/*"):        
+def sort_folder(path: Path, item_path: Path) -> None:    
     for item in item_path.iterdir():        
         if item.is_dir():
             if item.name in CATEGORIES.keys():                
