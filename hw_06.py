@@ -86,7 +86,7 @@ def move_file(file: Path, path: Path, categorie: str) -> None:
     if new_name.exists():        
         new_name = new_name.with_name(f"{new_name.stem}_{uuid4()}{file.suffix}")
     if file.parent != target_dir:
-        file.rename(new_name)
+        file.replace(new_name)
 
 def get_categorie(file: Path) -> str:
     ext = file.suffix.lower()
